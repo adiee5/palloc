@@ -1,0 +1,5 @@
+*.asm
+*.prg
+*.vice-mon-list
+.vscode
+examples/palloc.p8
