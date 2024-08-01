@@ -17,7 +17,7 @@ palloc{
         return true
     }
 
-    inline asmsub init_golden(){
+    inline asmsub init_golden() clobbers(X,Y) -> bool @A{
         %asm{{
         lda  #<$0400
         ldy  #>$0400
@@ -32,22 +32,26 @@ palloc{
         jsr  p8b_palloc.p8s_init
         }}
     }
-    inline asmsub init_loram(){
+    asmsub init_loram() clobbers(X,Y) -> bool @A{
         %asm{{
         lda  #<prog8_program_end
         ldy  #>prog8_program_end
         sta  p8b_palloc.p8s_init.p8v_start
         sty  p8b_palloc.p8s_init.p8v_start+1
 
-        lda  #<$9eff
-        ldy  #>$9eff
-        sta  p8b_palloc.p8s_init.p8v_end
+        sec
+        jsr  cbm.MEMTOP
+        dex
+        cpx  #$ff
+        bne  +
+        dey
+     +  stx  p8b_palloc.p8s_init.p8v_end
         sty  p8b_palloc.p8s_init.p8v_end+1
 
-        jsr  p8b_palloc.p8s_init
+        jmp  p8b_palloc.p8s_init
         }}
     }
-    inline asmsub init_hiram(){
+    inline asmsub init_hiram() clobbers(X,Y) -> bool @A{
         %asm{{
         lda  #<$a000
         ldy  #>$a000

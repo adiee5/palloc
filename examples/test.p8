@@ -5,7 +5,11 @@
 
 main{
     sub start(){
-        palloc.init($400,$4ff)
+        uword sh
+        sh, void = cbm.MEMTOP(0,true)
+        txt.print_uwhex(sh,true)
+        palloc.init_loram()
+        %breakpoint
         uword i=palloc.alloc(8)
         txt.print_uwhex(i,true)
         uword j=palloc.alloc(2+8)
