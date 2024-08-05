@@ -5,6 +5,8 @@
 %option no_sysinit
 %encoding iso
 
+; OUTDATED - See balloc for the proper implementation
+
 ; i really had no idea for this one, however, it's supposed to show, 
 ; that it's possible to have separate heaps per bank
 

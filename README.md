@@ -6,6 +6,6 @@ Add [`palloc.p8`](/palloc.p8) file to your project and import it. Call `palloc.i
 
 Outside of the most commonly used functions mentioned above, there are also additional functions, for example `palloc.reinit()`, which clears all allocations and resets the heap to usable state. It's generally recommended to normaly free the data one at the time, but there may be situations, where `reinit()` might be usefull. There's also `palloc.set_space(start_address, end_address)` which works similarly to `init()`, but doesn't actually reset the heap, therefore it can be usefull in environments, where it is expected for multiple programs running at the same time to utilize the same heap. 
 
-Have a look at the [examples](/examples/)!
+Have a look at the [examples](/examples/) and [subprojects](/subprojects/)!
 
-The library and all of the examples are licensed under MIT, feel free to use them in any kind of project.
+The library and all of the examples and subprojects are licensed under MIT, feel free to use them in any kind of project.

@@ -10,6 +10,7 @@ palloc{
     ; pointers returned to users point only to data
     ; size stores the size of the entire chunk, not just the data
 
+    ; inits the allocator. returns false on failure
     sub init(uword start, uword end) -> bool{
         if(initialised)return true
         if(not set_space(start, end))return false
@@ -17,7 +18,7 @@ palloc{
         return true
     }
 
-    inline asmsub init_golden() clobbers(X,Y) -> bool @A{
+    inline asmsub init_golden() clobbers(A,X,Y){
         %asm{{
         lda  #<$0400
         ldy  #>$0400
@@ -32,7 +33,7 @@ palloc{
         jsr  p8b_palloc.p8s_init
         }}
     }
-    asmsub init_loram() clobbers(X,Y) -> bool @A{
+    asmsub init_loram() clobbers(A,X,Y){
         %asm{{
         lda  #<prog8_program_end
         ldy  #>prog8_program_end
@@ -51,7 +52,7 @@ palloc{
         jmp  p8b_palloc.p8s_init
         }}
     }
-    inline asmsub init_hiram() clobbers(X,Y) -> bool @A{
+    inline asmsub init_hiram() clobbers(A,X,Y){
         %asm{{
         lda  #<$a000
         ldy  #>$a000
@@ -67,11 +68,13 @@ palloc{
         }}
     }
 
+    ; resets the heap to factory settings - everything is dealocated
     sub reinit(){
         if(not initialised)return
         pokew(startaddr, endaddr)
     }
 
+    ; sets up the palloc to a specified range, but doesn't reset the heap. may be useful for asigning one heap to multiple processes
     sub set_space(uword start, uword end) -> bool{
         if initialised{
             return true
@@ -93,6 +96,7 @@ palloc{
         return true
     }
 
+    ; allocates a specified amount of continuous memory and retuns a pointer to it or returns 0 in case of failure.
     sub alloc(uword size)->uword{
         if(not initialised)return 0
 
@@ -129,6 +133,8 @@ palloc{
         }
         return 0
     }
+
+    ; frees up previously allocated memory. provided pointer has to be IDENTICAL to one, that alloc() function gave you.
     sub free(uword ptr){
         if(not initialised) return
         if(ptr<(startaddr+2+MINSIZE-1) or ptr>=endaddr)return
