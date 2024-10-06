@@ -4,6 +4,7 @@ palloc{
     bool initialised=false
     const uword MINSIZE=7
 
+    %option force_output
     ;chunk structure:
     ; .byte size, size_msb, prevptr, prevptr_msb, nextptr, nextptr_msb, data, data, ....
 
@@ -33,7 +34,7 @@ palloc{
         jsr  p8b_palloc.p8s_init
         }}
     }
-    asmsub init_loram() clobbers(A,X,Y){
+    asmsub init_loram() clobbers(X,Y) -> bool @A{
         %asm{{
         lda  #<prog8_program_end
         ldy  #>prog8_program_end
@@ -151,6 +152,23 @@ palloc{
             pokew(reg_next+2,reg_curprev)
         }
         pokew(ptr-6,0)
+    }
+
+    ; returns amount of unallocated bytes in the heap space
+    sub free_space() -> uword{
+        if(not initialised)return 0
+        uword result=0
+        reg_curprev = startaddr+2
+        reg_next = peekw(startaddr)
+        reg_temp=0
+        repeat {
+            result+=reg_next-(reg_curprev+reg_temp)
+            reg_curprev=reg_next
+            if (reg_curprev>=endaddr) break
+            reg_temp=peekw(reg_curprev)
+            reg_next=peekw(reg_curprev+4)
+        }
+        return result
     }
 
     ; temporary registers used for internal operations (cx16 registers used to be clobbered before)

@@ -9,7 +9,10 @@ main{
         sh, void = cbm.MEMTOP(0,true)
         txt.print_uwhex(sh,true)
         palloc.init_loram()
+        txt.nl()
         %breakpoint
+        txt.print_uw(palloc.free_space())
+        txt.nl()
         uword i=palloc.alloc(8)
         txt.print_uwhex(i,true)
         uword j=palloc.alloc(2+8)
@@ -22,6 +25,8 @@ main{
         txt.print_uwhex(palloc.alloc(1),true)
         txt.print_uwhex(palloc.alloc(0),true)
         txt.print_uwhex(palloc.alloc(1),true)
+        txt.nl()
+        txt.print_uw(palloc.free_space())
         ;%breakpoint
     }
 }
