@@ -1,4 +1,5 @@
 %import balloc
+%import lk_badrv
 %import dynstr
 %import textio
 %zeropage basicsafe

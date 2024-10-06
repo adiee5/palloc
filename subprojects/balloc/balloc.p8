@@ -1,8 +1,7 @@
 %import palloc
-%import bnk_mgr
+; don't forget to import badrv of choice in your program
 balloc{
 
-    ubyte groupid=0
     ubyte firstbank
     &ubyte nextbank=$A000
 
@@ -14,15 +13,12 @@ balloc{
         const ubyte INVIN=$18 ; User provided invalid input (for example requested an allocation with size of 0)
     }
 
-    ; inits the balloc. this assumes, that `bnk_mgr.init()` was already called!!
+    ; inits the balloc. make sure your bank allocator of choice is already initialised!
     sub init()->bool{
-        if groupid==0{
-            groupid=bnk_mgr.get_groupid()
-            if groupid==0{
-                return false
-            }
+        if not badrv.prepare(){
+            return false
         }
-        firstbank=bnk_mgr.get_bank(groupid)
+        firstbank=badrv.get_bank()
         if firstbank==0{
             return false
         }
@@ -93,7 +89,7 @@ balloc{
             if (nextbank==0) break
             cx16.rambank(nextbank)
         }
-        nextbank=bnk_mgr.get_bank(groupid)
+        nextbank=badrv.get_bank()
         if nextbank==0{
             pokew(b_ptr,0)
             b_ptr[bptr.bank]=balloc.err.NOMEM
@@ -170,7 +166,7 @@ balloc{
             if (nextbank==0) break
             cx16.rambank(nextbank)
         }
-        nextbank=bnk_mgr.get_bank(groupid)
+        nextbank=badrv.get_bank()
         if nextbank==0{
             pokew(b_ptr,0)
             b_ptr[bptr.bank]=balloc.err.NOMEM
@@ -187,7 +183,7 @@ balloc{
                 cx16.rambank(nextbank)
             }
             nextbank=0
-            void bnk_mgr.free_bank(groupid,b_ptr[bptr.bank])
+            badrv.free_bank(b_ptr[bptr.bank])
             ; It could technically be INVIN (either in the arguments provided to an constructor or a bug in the constructor), but it's most likely TOBIG
             b_ptr[bptr.bank]=balloc.err.TOBIG
             return false
@@ -222,7 +218,7 @@ balloc{
                 }
                 nextbank=ptr as ubyte
             }
-            void bnk_mgr.free_bank(groupid,bank) ; it's unlikely, that this would yield false, if it would, that'd mean we clobbered data not bellonging to us
+            badrv.free_bank(bank) ; it's unlikely, that this would yield false, if it would, that'd mean we clobbered data not bellonging to us
             ;if_z %asm{{brk}}
         }
     }
@@ -251,11 +247,11 @@ balloc{
     }
 
     ; disables balloc completely and frees all banks it has reserved. all pointers allocated up to this point are INVALID! 
-    ; after running this, you can grab the value of balloc.groupid, reset the variable to 0 and reuse the value somewhere else
+    ; after running this, you can grab the value of lk_badrv.groupid, reset the variable to 0 and reuse the value somewhere else
     ; or you can keep the variable intact, so when you initialise the balloc again, it will use the same groupid as before.
     sub shutdown(){
         if (not palloc.initialised) return
-        void bnk_mgr.free_groupid(groupid) ; this only fails, when there are no banks of ours, we definitely have some.
+        badrv.free_all()
         palloc.initialised=false
     }
 }

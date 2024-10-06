@@ -6,4 +6,6 @@ Many functions from `balloc` block have two variants: `_m` and `_p`. `_m` varian
 
 See [`balloc.p8`](./balloc.p8) and [examples](./examples/)
 
+### ***Dont forget to include a [badrv](./badrv/) of choice into your program!***
+
 This folder also contains [bnk_mgr](./bnk_mgr.p8) library, which is a bank reservation system written by @tallLeRoy. It's included it this repo, because it's an essential dependency of balloc, the author himself doesn't want to host repo for that and he gave me consent to do so.

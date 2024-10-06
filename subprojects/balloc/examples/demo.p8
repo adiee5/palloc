@@ -1,4 +1,5 @@
 %import balloc
+%import lk_badrv
 %import textio
 %zeropage basicsafe
 %option no_sysinit
